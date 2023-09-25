@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Search plant names</title>
+    <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/@tarekraafat/autocomplete.js@10.2.7/dist/css/autoComplete.01.min.css">
+    <style>
+        .autoComplete_wrapper {
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+            /* width: 50%; */
+        }
+
+        #autoComplete {
+            width: 100%;
+        }
+
+        #autoComplete_list {
+            max-height: 500px;
+        }
+    </style>
+</head>
+<body>
+    <div class="autoComplete_wrapper">
+        <input id="autoComplete" type="search" dir="ltr" spellcheck=false autocorrect="off" autocomplete="off"
+            autocapitalize="off">
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/@tarekraafat/autocomplete.js@10.2.7/dist/autoComplete.min.js"></script>
+    <script>
+        let names = [];
+        fetch('BI_main.csv')
+            .then(response => response.text())
+            .then(data => {
+                const lines = data.split("\n");
+                const array = lines.map(line => line.split(","));
+                names = array.map(function (value, index) { return value[3] });
+                const autoCompleteJS = new autoComplete({
+                    placeHolder: "Search for plants...",
+                    data: {
+                        src: names,
+                        cache: true,
+                    },
+                    resultItem: {
+                        highlight: true
+                    },
+                    resultsList: {
+                        maxResults: 1000,
+                        id: "autoComplete_list",
+                    },
+                    events: {
+                        input: {
+                            selection: (event) => {
+                                const selection = event.detail.selection.value;
+                                autoCompleteJS.input.value = selection;
+                            }
+                        }
+                    }
+                });
+
+            })
+            .catch(error => console.error("An error occurred:", error));
+    </script>
+</body>
+</html>
